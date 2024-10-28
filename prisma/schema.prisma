@@ -1,0 +1,36 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Station {
+  id        String @id @default(uuid())
+  name      String
+  latitude  String
+  longitude String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  readings Reading[] @relation("StationReadings")
+
+  @@map("stations")
+}
+
+model Reading {
+  id        String   @id @default(uuid())
+  stationId String   @map("station_id")
+  dateTime  DateTime @default(now()) @map("date_time")
+
+  temperature    Float
+  humidity       Float
+  rainfallVolume Float @map("rainfall_volume")
+
+  station Station @relation("StationReadings", fields: [stationId], references: [id])
+
+  @@map("readings")
+}

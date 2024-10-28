@@ -6,7 +6,7 @@ services:
     container_name: ete-monitoring-station-api
     restart: always
     environment:
-      - DATABASE_URL=postgres://root:ete#2810@db:5432/emm
+      - DATABASE_URL=postgres://root:ete#2810@localhost:5432/emm
     ports:
       - '3333:3333'
     depends_on:
