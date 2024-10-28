@@ -1,0 +1,8 @@
+POST http://localhost:3333/example-create
+Content-Type: application/json
+
+{
+  "title": "example",
+  "details": "this is a example",
+  "quantity": 40
+}
