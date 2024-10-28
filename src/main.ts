@@ -34,6 +34,16 @@ app.setSerializerCompiler(serializerCompiler);
 
 app.register(exampleRoute);
 
-app.listen({ port: 3333, host: '0.0.0.0' }).then(() => {
-  console.log('HTTP server running');
+app.listen({ port: parseInt(process.env.PORT || '3333'), host: process.env.HOST || '0.0.0.0' }, (err) => {
+  if (err) {
+    throw new Error(err.message);
+  }
+
+  const address = app.server.address();
+
+  if (address && typeof address === 'object') {
+    console.log(`Server listening on http://localhost:${address.port}`);
+  } else {
+    console.log(`Server started but couldn't determine the address.`);
+  }
 });

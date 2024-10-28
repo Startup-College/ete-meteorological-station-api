@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/main.ts",
-    "build": "tsup src --format esm",
+    "build": "tsup src --format esm --out-dir dist",
     "start": "node dist/main.mjs",
     "fix": "prettier \"src/***.ts\" --write && eslint --fix \"src/**/*.ts\"",
     "prepare": "husky"
