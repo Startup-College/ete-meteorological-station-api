@@ -7,6 +7,8 @@ export function exampleRoute(app: FastifyInstance) {
     '/example-create',
     {
       schema: {
+        summary: 'criar exemplo',
+        tags: ['example'],
         body: z.object({
           title: z.string().min(4),
           details: z.string().nullable(),
