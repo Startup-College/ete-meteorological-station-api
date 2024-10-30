@@ -23,7 +23,7 @@
 ### gerar o modelo do banco
 
 ```bash
-  npx prisma migrate dev --name
+  npx prisma migrate dev
 ```
 
 ### Rodar o projeto
