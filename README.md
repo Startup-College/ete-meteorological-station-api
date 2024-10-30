@@ -12,6 +12,11 @@
  git clone https://github.com/Startup-College/ete-meteorological-station-api.git
 ```
 
+### Acessar a pasta
+
+```bash
+cd ete-meteorological-station-api
+```
 
 ### Instalar as dependências
 
