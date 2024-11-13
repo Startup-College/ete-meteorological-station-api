@@ -4,4 +4,3 @@ docker-compose.yml
 .env
 entrypoint.sh
 dev.db
-migrations

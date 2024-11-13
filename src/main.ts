@@ -6,7 +6,8 @@ import fastifySwaggerUi from '@fastify/swagger-ui';
 
 import { createStation } from './routes/create-station';
 import { addReadingStation } from './routes/add-reading-station';
-import { getLastReadingsByStation } from './routes/get-last-readings-by-station';
+import { getLastReadingByStation } from './routes/get-last-reading-by-station';
+import { readingsByStation } from './routes/readings-by-station';
 
 const app = fastify();
 
@@ -36,7 +37,8 @@ app.setSerializerCompiler(serializerCompiler);
 
 app.register(createStation, { prefix: 'api/v1' });
 app.register(addReadingStation, { prefix: 'api/v1' });
-app.register(getLastReadingsByStation, { prefix: 'api/v1' });
+app.register(getLastReadingByStation, { prefix: 'api/v1' });
+app.register(readingsByStation, { prefix: 'api/v1' });
 
 app.listen({ port: parseInt(process.env.PORT || '3333'), host: process.env.HOST || '0.0.0.0' }, (err) => {
   if (err) {
