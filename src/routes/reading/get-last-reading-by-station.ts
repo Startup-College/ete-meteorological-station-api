@@ -1,11 +1,11 @@
 import { FastifyInstance } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { z } from 'zod';
-import { prisma } from '../lib/prisma';
+import { prisma } from '../../lib/prisma';
 
 export function getLastReadingByStation(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
-    '/last-reading-by-station/:stationId',
+    '/last-reading-by-station/:name',
     {
       schema: {
         summary: 'Obter a última leitura da estação',
@@ -13,7 +13,7 @@ export function getLastReadingByStation(app: FastifyInstance) {
         response: {
           200: z.object({
             stationId: z.string().uuid(),
-            stationName: z.string(),
+            name: z.string(),
             dateTime: z.date(),
             temperature: z.number(),
             humidity: z.number(),
@@ -27,11 +27,11 @@ export function getLastReadingByStation(app: FastifyInstance) {
             error: z.string()
           })
         },
-        params: z.object({ stationId: z.string().uuid() })
+        params: z.object({ name: z.string() })
       }
     },
     async (request, reply) => {
-      const { stationId } = request.params;
+      const { name } = request.params;
 
       const lastReading = await prisma.reading.findFirst({
         orderBy: {
@@ -49,7 +49,7 @@ export function getLastReadingByStation(app: FastifyInstance) {
           humidity: true,
           rainfallVolume: true
         },
-        where: { stationId }
+        where: { station: { name } }
       });
 
       if (!lastReading) {
@@ -75,7 +75,7 @@ export function getLastReadingByStation(app: FastifyInstance) {
 
       const formattedReading = {
         stationId: lastReading.stationId,
-        stationName: lastReading.station.name,
+        name: lastReading.station.name,
         dateTime: lastReading.dateTime,
         temperature: lastReading.temperature,
         humidity: lastReading.humidity,

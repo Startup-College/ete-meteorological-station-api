@@ -4,10 +4,10 @@ import { serializerCompiler, validatorCompiler, jsonSchemaTransform } from 'fast
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 
-import { createStation } from './routes/create-station';
-import { addReadingStation } from './routes/add-reading-station';
-import { getLastReadingByStation } from './routes/get-last-reading-by-station';
-import { readingsByStation } from './routes/readings-by-station';
+import { createStation } from './routes/station/create-station';
+import { addReadingStation } from './routes/reading/add-reading-station';
+import { getLastReadingByStation } from './routes/reading/get-last-reading-by-station';
+import { readingsByStation } from './routes/reading/readings-by-station';
 
 const app = fastify();
 
