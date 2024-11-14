@@ -8,6 +8,7 @@ import { createStation } from './routes/station/create-station';
 import { addReadingStation } from './routes/reading/add-reading-station';
 import { getLastReadingByStation } from './routes/reading/get-last-reading-by-station';
 import { readingsByStation } from './routes/reading/readings-by-station';
+import { listStation } from './routes/station/list-station';
 
 const app = fastify();
 
@@ -35,7 +36,11 @@ app.register(fastifySwaggerUi, {
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
+// API station
 app.register(createStation, { prefix: 'api/v1' });
+app.register(listStation, { prefix: 'api/v1' });
+
+// API Reading
 app.register(addReadingStation, { prefix: 'api/v1' });
 app.register(getLastReadingByStation, { prefix: 'api/v1' });
 app.register(readingsByStation, { prefix: 'api/v1' });
