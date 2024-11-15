@@ -1,11 +1,15 @@
 import { prisma } from '../src/lib/prisma';
 
 async function seed() {
+  const user = await prisma.user.create({
+    data: { username: 'admin', password: 'admin' }
+  });
   const station = await prisma.station.create({
     data: {
-      name: 'ETE Station Monitoring Example',
+      name: 'Station Monitoring Example',
       latitude: '-8.139549723590184',
-      longitude: '-34.9463608687136'
+      longitude: '-34.9463608687136',
+      userId: user.id
     }
   });
 
