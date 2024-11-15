@@ -9,6 +9,8 @@ import { addReadingStation } from './routes/reading/add-reading-station';
 import { getLastReadingByStation } from './routes/reading/get-last-reading-by-station';
 import { readingsByStation } from './routes/reading/readings-by-station';
 import { listStation } from './routes/station/list-station';
+import { registerUser } from './routes/user/register-user';
+import { loginUser } from './routes/user/login-user';
 
 const app = fastify();
 
@@ -17,15 +19,23 @@ app.register(fastifyCors, {
 });
 
 app.register(fastifySwagger, {
-  swagger: {
-    consumes: ['application/json'],
-    produces: ['application/json'],
+  openapi: {
     info: {
       title: 'ETE - Estação de Monitoramento Modular (ETE - EMM)',
       description: 'Especificação da API ETE - EMM',
       version: '1.0.0'
+    },
+    components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
     }
   },
+
   transform: jsonSchemaTransform
 });
 
@@ -35,6 +45,10 @@ app.register(fastifySwaggerUi, {
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
+
+// API user
+app.register(registerUser, { prefix: 'api/v1' });
+app.register(loginUser, { prefix: 'api/v1' });
 
 // API station
 app.register(createStation, { prefix: 'api/v1' });
