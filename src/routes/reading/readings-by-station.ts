@@ -5,7 +5,7 @@ import { prisma } from '../../lib/prisma';
 
 export function readingsByStation(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
-    '/readings-by-station/:stationId',
+    '/readings-by-station/:name',
     {
       schema: {
         summary: 'Listar últimas leituras de cada estação',
@@ -13,7 +13,6 @@ export function readingsByStation(app: FastifyInstance) {
         response: {
           200: z.array(
             z.object({
-              stationId: z.string().uuid(),
               stationName: z.string(),
               dateTime: z.date(),
               temperature: z.number(),
@@ -29,11 +28,11 @@ export function readingsByStation(app: FastifyInstance) {
             error: z.string()
           })
         },
-        params: z.object({ stationId: z.string().uuid() })
+        params: z.object({ name: z.string() })
       }
     },
     async (request, reply) => {
-      const { stationId } = request.params;
+      const { name } = request.params;
 
       const lastReadings = await prisma.reading.findMany({
         orderBy: {
@@ -51,7 +50,7 @@ export function readingsByStation(app: FastifyInstance) {
           humidity: true,
           rainfallVolume: true
         },
-        where: { stationId }
+        where: { station: { name } }
       });
 
       if (!lastReadings) {
@@ -77,7 +76,6 @@ export function readingsByStation(app: FastifyInstance) {
         }
 
         return {
-          stationId: reading.stationId,
           stationName: reading.station.name,
           dateTime: reading.dateTime,
           temperature: reading.temperature,
