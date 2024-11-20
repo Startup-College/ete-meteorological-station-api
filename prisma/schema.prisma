@@ -8,25 +8,23 @@ generator client {
 }
 
 model Station {
-  id        String @id @default(uuid())
+  id        Int @id @default(autoincrement())
   name      String
   latitude  String?
   longitude String?
+  token String @default(uuid())
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
   readings Reading[] @relation("StationReadings")
 
-  user       User?      @relation("UserStations", fields: [userId], references: [id])
-  userId     String?
-
   @@map("stations")
 }
 
 model Reading {
   id        Int   @id @default(autoincrement())
-  stationId String   @map("station_id")
+  stationId Int   @map("station_id")
   dateTime  DateTime @default(now()) @map("date_time")
 
   temperature    Float
@@ -46,9 +44,6 @@ model User {
 
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
-
-  
-  stations Station[] @relation("UserStations")
 
   @@map("users")
 }

@@ -1,15 +1,11 @@
 import { prisma } from '../src/lib/prisma';
 
 async function seed() {
-  const user = await prisma.user.create({
-    data: { username: 'admin', password: 'admin' }
-  });
   const station = await prisma.station.create({
     data: {
-      name: 'Station Monitoring Example',
+      name: 'Station Monitoring Example 1',
       latitude: '-8.139549723590184',
-      longitude: '-34.9463608687136',
-      userId: user.id
+      longitude: '-34.9463608687136'
     }
   });
 
@@ -18,31 +14,31 @@ async function seed() {
       {
         stationId: station.id,
         temperature: 18.0,
-        humidity: 70,
+        humidity: 20,
         rainfallVolume: 10.0
       },
       {
         stationId: station.id,
         temperature: 23.0,
-        humidity: 55,
+        humidity: 15,
         rainfallVolume: 0.0
       },
       {
         stationId: station.id,
         temperature: 25.0,
-        humidity: 65,
+        humidity: 10,
         rainfallVolume: 2.0
       },
       {
         stationId: station.id,
         temperature: 26.0,
-        humidity: 62,
+        humidity: 13,
         rainfallVolume: 0.5
       },
       {
         stationId: station.id,
         temperature: 18.0,
-        humidity: 70,
+        humidity: 11,
         rainfallVolume: 10.0
       }
     ]
