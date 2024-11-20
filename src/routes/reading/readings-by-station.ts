@@ -5,7 +5,7 @@ import { prisma } from '../../lib/prisma';
 
 export function readingsByStation(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
-    '/readings-by-station/:name',
+    `/readings/:id`,
     {
       schema: {
         summary: 'Listar últimas leituras de cada estação',
@@ -13,33 +13,28 @@ export function readingsByStation(app: FastifyInstance) {
         response: {
           200: z.array(
             z.object({
-              stationName: z.string(),
+              name: z.string(),
               dateTime: z.date(),
               temperature: z.number(),
               humidity: z.number(),
-              rainfallVolume: z.number(),
-              weather: z.object({
-                icon: z.string(),
-                description: z.string()
-              })
+              rainfallVolume: z.number()
             })
           ),
           404: z.object({
             error: z.string()
           })
         },
-        params: z.object({ name: z.string() })
+        params: z.object({ id: z.string() })
       }
     },
     async (request, reply) => {
-      const { name } = request.params;
+      const id = Number(request.params.id);
 
-      const lastReadings = await prisma.reading.findMany({
+      const readings = await prisma.reading.findMany({
         orderBy: {
           dateTime: 'desc'
         },
         select: {
-          stationId: true,
           station: {
             select: {
               name: true
@@ -50,45 +45,22 @@ export function readingsByStation(app: FastifyInstance) {
           humidity: true,
           rainfallVolume: true
         },
-        where: { station: { name } }
+        where: { station: { id } }
       });
 
-      if (!lastReadings) {
+      if (!readings) {
         return reply.code(404).send({ error: 'Nenhuma leitura da estação foi encontrada' });
       }
 
-      const formattedReadings = lastReadings.map((reading) => {
-        let icon = '';
-        let description = '';
+      const response = readings.map((r) => ({
+        name: r.station.name,
+        dateTime: r.dateTime,
+        temperature: r.temperature,
+        humidity: r.humidity,
+        rainfallVolume: r.rainfallVolume
+      }));
 
-        const hour = new Date(reading.dateTime).getHours();
-        const isDaytime = hour >= 6 && hour < 18;
-
-        if (reading.rainfallVolume > 0) {
-          icon = isDaytime ? 'icone de dia com chuva' : 'icone de noite com chuva';
-          description = 'Chuva';
-        } else if (reading.temperature > 30) {
-          icon = isDaytime ? 'icone de dia Ensolarado' : 'icone de noite céu limpo';
-          description = isDaytime ? 'Ensolarado' : 'Céu limpo';
-        } else {
-          icon = 'icone de nublado';
-          description = 'Nublado';
-        }
-
-        return {
-          stationName: reading.station.name,
-          dateTime: reading.dateTime,
-          temperature: reading.temperature,
-          humidity: reading.humidity,
-          rainfallVolume: reading.rainfallVolume,
-          weather: {
-            icon,
-            description
-          }
-        };
-      });
-
-      return reply.code(200).send(formattedReadings);
+      return reply.code(200).send(response);
     }
   );
 }
