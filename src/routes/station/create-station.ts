@@ -6,7 +6,7 @@ import { authenticateService } from '../../middleware/authenticate-middleware';
 
 export function createStation(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().post(
-    '/create-station',
+    '/stations',
     {
       preHandler: authenticateService.authenticateRequest,
       schema: {
@@ -24,7 +24,7 @@ export function createStation(app: FastifyInstance) {
         }),
         response: {
           201: z.object({
-            id: z.string().uuid()
+            token: z.string().uuid()
           }),
           400: z.object({ error: z.string() }),
           500: z.object({ error: z.string() })
@@ -34,7 +34,6 @@ export function createStation(app: FastifyInstance) {
 
     async (request, reply) => {
       try {
-        const { user } = request;
         const { name, latitude, longitude } = request.body;
 
         const existingStation = await prisma.station.findFirst({
@@ -45,16 +44,15 @@ export function createStation(app: FastifyInstance) {
           return reply.status(400).send({ error: 'Esta estação já foi criada.' });
         }
 
-        const { id } = await prisma.station.create({
+        const { token } = await prisma.station.create({
           data: {
             name,
             latitude,
-            longitude,
-            userId: user?.id
+            longitude
           }
         });
 
-        return reply.status(201).send({ id });
+        return reply.status(201).send({ token });
       } catch (error) {
         console.log(error);
         reply.status(500).send({ error: 'Erro interno do servidor' });
