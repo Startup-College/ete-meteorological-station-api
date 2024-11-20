@@ -6,7 +6,6 @@ import fastifySwaggerUi from '@fastify/swagger-ui';
 
 import { createStation } from './routes/station/create-station';
 import { addReadingStation } from './routes/reading/add-reading-station';
-import { getLastReadingByStation } from './routes/reading/get-last-reading-by-station';
 import { readingsByStation } from './routes/reading/readings-by-station';
 import { listStation } from './routes/station/list-station';
 import { registerUser } from './routes/user/register-user';
@@ -56,7 +55,6 @@ app.register(listStation, { prefix: 'api/v1' });
 
 // API Reading
 app.register(addReadingStation, { prefix: 'api/v1' });
-app.register(getLastReadingByStation, { prefix: 'api/v1' });
 app.register(readingsByStation, { prefix: 'api/v1' });
 
 app.listen({ port: parseInt(process.env.PORT || '3333'), host: process.env.HOST || '0.0.0.0' }, (err) => {
