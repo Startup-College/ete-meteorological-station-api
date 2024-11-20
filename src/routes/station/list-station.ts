@@ -5,7 +5,7 @@ import { prisma } from '../../lib/prisma';
 
 export function listStation(app: FastifyInstance) {
   app.withTypeProvider<ZodTypeProvider>().get(
-    '/list-station',
+    '/stations',
     {
       schema: {
         summary: 'Listar estações',
@@ -13,9 +13,22 @@ export function listStation(app: FastifyInstance) {
         response: {
           200: z.array(
             z.object({
+              id: z.number(),
               name: z.string(),
-              latitude: z.string(),
-              longitude: z.string()
+              latitude: z.string().nullable(),
+              longitude: z.string().nullable(),
+              lastReading: z
+                .object({
+                  dateTime: z.date(),
+                  temperature: z.number(),
+                  humidity: z.number(),
+                  rainfallVolume: z.number()
+                })
+                .nullable(),
+              weather: z.object({
+                icon: z.string(),
+                description: z.string()
+              })
             })
           ),
           404: z.object({ error: z.string() }),
@@ -25,13 +38,60 @@ export function listStation(app: FastifyInstance) {
     },
     async (request, reply) => {
       try {
-        const stations = await prisma.station.findMany();
+        const stations = await prisma.station.findMany({
+          select: {
+            id: true,
+            name: true,
+            latitude: true,
+            longitude: true,
+            readings: {
+              orderBy: { dateTime: 'desc' },
+              select: {
+                dateTime: true,
+                temperature: true,
+                humidity: true,
+                rainfallVolume: true
+              }
+            }
+          }
+        });
 
         if (stations.length === 0) {
           reply.status(404).send({ error: 'Nenhuma estação encontrada' });
-        } else {
-          reply.status(200).send(stations);
         }
+
+        const response = stations.map((station) => {
+          let icon = '';
+          let description = '';
+
+          const hour = new Date(station.readings[0].dateTime).getHours();
+          const isDaytime = hour >= 6 && hour < 18;
+
+          if (station.readings[0].rainfallVolume > 0) {
+            icon = isDaytime ? 'icone de dia com chuva' : 'icone de noite com chuva';
+            description = 'Chuva';
+          } else if (station.readings[0].temperature > 30) {
+            icon = isDaytime ? 'icone de dia Ensolarado' : 'icone de noite céu limpo';
+            description = isDaytime ? 'Ensolarado' : 'Céu limpo';
+          } else {
+            icon = 'icone de nublado';
+            description = 'Nublado';
+          }
+
+          return {
+            id: station.id,
+            name: station.name,
+            latitude: station.latitude,
+            longitude: station.longitude,
+            lastReading: station.readings[0] || null,
+            weather: {
+              icon,
+              description
+            }
+          };
+        });
+
+        reply.status(200).send(response);
       } catch (error) {
         console.error(error);
         reply.status(500).send({ error: 'Erro interno no servidor' });
