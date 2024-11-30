@@ -67,14 +67,14 @@ export function listStation(app: FastifyInstance) {
           const hour = new Date(station.readings[0].dateTime).getHours();
           const isDaytime = hour >= 6 && hour < 18;
 
-          if (station.readings[0].rainfallVolume > 0) {
-            icon = isDaytime ? 'icone de dia com chuva' : 'icone de noite com chuva';
+          if (station.readings[0]?.rainfallVolume > 0) {
+            icon = isDaytime ? '/public/assets/icons/cloud-sun-rain.png' : '/public/assets/icons/night-rain.png';
             description = 'Chuva';
-          } else if (station.readings[0].temperature > 30) {
-            icon = isDaytime ? 'icone de dia Ensolarado' : 'icone de noite céu limpo';
+          } else if (station.readings[0]?.temperature > 30) {
+            icon = isDaytime ? '/public/assets/icons/day-sunny.png' : '/public/assets/icons/night-clear.png';
             description = isDaytime ? 'Ensolarado' : 'Céu limpo';
           } else {
-            icon = 'icone de nublado';
+            icon = '/public/assets/icons/cloudy.png';
             description = 'Nublado';
           }
 

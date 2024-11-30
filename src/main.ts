@@ -10,6 +10,8 @@ import { readingsByStation } from './routes/reading/readings-by-station';
 import { listStation } from './routes/station/list-station';
 import { registerUser } from './routes/user/register-user';
 import { loginUser } from './routes/user/login-user';
+import fastifyStatic from '@fastify/static';
+import { join } from 'path';
 
 const app = fastify();
 
@@ -44,6 +46,11 @@ app.register(fastifySwaggerUi, {
 
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
+
+app.register(fastifyStatic, {
+  root: join(__dirname, '../public'),
+  prefix: '/public/'
+});
 
 // API user
 app.register(registerUser, { prefix: 'api/v1' });
