@@ -57,25 +57,32 @@ export function listStation(app: FastifyInstance) {
         });
 
         if (stations.length === 0) {
-          reply.status(404).send({ error: 'Nenhuma estação encontrada' });
+          return reply.status(404).send({ error: 'Nenhuma estação encontrada' });
         }
 
         const response = stations.map((station) => {
           let icon = '';
           let description = '';
+          let lastReading = null; // Valor padrão para lastReading
 
-          const hour = new Date(station.readings[0].dateTime).getHours();
-          const isDaytime = hour >= 6 && hour < 18;
+          if (station.readings.length > 0) {
+            const lastReadingData = station.readings[0]; // A primeira leitura
 
-          if (station.readings[0]?.rainfallVolume > 0) {
-            icon = isDaytime ? '/public/assets/icons/cloud-sun-rain.svg' : '/public/assets/icons/night-rain.svg';
-            description = 'Chuva';
-          } else if (station.readings[0]?.temperature > 30) {
-            icon = isDaytime ? '/public/assets/icons/day-sunny.svg' : '/public/assets/icons/night-clear.svg';
-            description = isDaytime ? 'Ensolarado' : 'Céu limpo';
-          } else {
-            icon = '/public/assets/icons/cloudy.svg';
-            description = 'Nublado';
+            const hour = new Date(lastReadingData.dateTime).getHours();
+            const isDaytime = hour >= 6 && hour < 18;
+
+            if (lastReadingData.rainfallVolume > 0) {
+              icon = isDaytime ? '/public/assets/icons/cloud-sun-rain.png' : '/public/assets/icons/night-rain.png';
+              description = 'Chuva';
+            } else if (lastReadingData.temperature > 30) {
+              icon = isDaytime ? '/public/assets/icons/day-sunny.png' : '/public/assets/icons/night-clear.png';
+              description = isDaytime ? 'Ensolarado' : 'Céu limpo';
+            } else {
+              icon = '/public/assets/icons/cloudy.png';
+              description = 'Nublado';
+            }
+
+            lastReading = lastReadingData; // Se houver leituras, use a última
           }
 
           return {
@@ -83,7 +90,7 @@ export function listStation(app: FastifyInstance) {
             name: station.name,
             latitude: station.latitude,
             longitude: station.longitude,
-            lastReading: station.readings[0] || null,
+            lastReading: lastReading,
             weather: {
               icon,
               description
@@ -91,7 +98,7 @@ export function listStation(app: FastifyInstance) {
           };
         });
 
-        reply.status(200).send(response);
+        return reply.status(200).send(response);
       } catch (error) {
         console.error(error);
         reply.status(500).send({ error: 'Erro interno no servidor' });

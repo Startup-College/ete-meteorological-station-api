@@ -12,6 +12,7 @@ import { registerUser } from './routes/user/register-user';
 import { loginUser } from './routes/user/login-user';
 import fastifyStatic from '@fastify/static';
 import { join } from 'path';
+import { getTokenByStationId } from './routes/user/operation-users';
 
 const app = fastify();
 
@@ -44,6 +45,10 @@ app.register(fastifySwaggerUi, {
   routePrefix: '/'
 });
 
+app.get('/admin', async (request, reply) => {
+  return reply.sendFile('index.html');
+});
+
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
@@ -55,6 +60,7 @@ app.register(fastifyStatic, {
 // API user
 app.register(registerUser, { prefix: 'api/v1' });
 app.register(loginUser, { prefix: 'api/v1' });
+app.register(getTokenByStationId, { prefix: 'api/v1' });
 
 // API station
 app.register(createStation, { prefix: 'api/v1' });

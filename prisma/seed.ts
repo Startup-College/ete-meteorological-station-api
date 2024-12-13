@@ -51,8 +51,8 @@ async function seed() {
   const threeMonthsAgo = new Date();
   threeMonthsAgo.setMonth(now.getMonth() - 3);
 
-  // Gerar até 1000 registros
-  const readingsArray = generateReadings(station.id, threeMonthsAgo, now, 1, 1000);
+  // Gerar até 200 registros
+  const readingsArray = generateReadings(station.id, threeMonthsAgo, now, 1, 200);
 
   // Inserir leituras na base de dados
   await prisma.reading.createMany({

@@ -5,13 +5,12 @@ import { prisma } from '../../lib/prisma';
 import bcrypt from 'bcrypt';
 
 export async function registerUser(app: FastifyInstance) {
-  // Criar o usuário root padrão se não existir
   const rootUser = await prisma.user.findFirst({
     where: { username: 'root' }
   });
 
   if (!rootUser) {
-    const rootPassword = await bcrypt.hash('12345678', 10); 
+    const rootPassword = await bcrypt.hash('12345678', 10);
     await prisma.user.create({
       data: { username: 'root', password: rootPassword }
     });
